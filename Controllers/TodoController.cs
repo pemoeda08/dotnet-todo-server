@@ -1,7 +1,10 @@
-namespace TodoServer {
+using Microsoft.AspNetCore.Mvc;
 
-    public class TodoController : ControllerBase {
+namespace TodoServer
+{
 
-        
+    public class TodoController : ControllerBase
+    {
+
     }
 }
