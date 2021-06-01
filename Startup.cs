@@ -15,6 +15,7 @@ using Microsoft.Extensions.Hosting;
 using Microsoft.Extensions.Logging;
 using Microsoft.IdentityModel.Tokens;
 using Microsoft.OpenApi.Models;
+using TodoServer.Data.Impl;
 
 namespace TodoServer
 {
@@ -32,7 +33,7 @@ namespace TodoServer
         {
 
             services.AddControllers();
-
+            services.AddDbContext<TodoDbContext>();
             services.AddAuthentication(JwtBearerDefaults.AuthenticationScheme)
                 .AddJwtBearer(opt =>
                 {
