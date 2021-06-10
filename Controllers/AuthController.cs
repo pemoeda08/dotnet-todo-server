@@ -25,6 +25,7 @@ namespace TodoServer.Controllers
         }
 
         [HttpPost("login")]
+        [AllowAnonymous]
         public async Task<IActionResult> Login([FromBody] AuthDto login)
         {
             var user = await userRepo.GetUser(login.Username, login.Password);

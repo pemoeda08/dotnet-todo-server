@@ -11,6 +11,7 @@ namespace TodoServer
         public static IServiceCollection AddRepositories(this IServiceCollection services)
         {
             services.AddScoped<IUserRepository, UserRepository>();
+            services.AddScoped<ITodoRepository, TodoRepository>();
             return services;
         }
     }

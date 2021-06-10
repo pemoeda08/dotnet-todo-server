@@ -10,6 +10,7 @@ using Microsoft.EntityFrameworkCore;
 using TodoServer.Data.Entities;
 using TodoServer.Data.Impl;
 using TodoServer.Dto.Todo;
+using TodoServer.Data;
 
 namespace TodoServer
 {
@@ -18,12 +19,14 @@ namespace TodoServer
     [Route("todo")]
     public class TodoController : ControllerBase
     {
-        private readonly TodoDbContext dbContext;
+        private readonly ITodoRepository todoRepo;
+        private readonly IUserRepository userRepo;
         private readonly IMapper mapper;
 
-        public TodoController(TodoDbContext dbContext, IMapper mapper)
+        public TodoController(ITodoRepository todoRepo, IUserRepository userRepo, IMapper mapper)
         {
-            this.dbContext = dbContext;
+            this.todoRepo = todoRepo;
+            this.userRepo = userRepo;
             this.mapper = mapper;
         }
 
@@ -31,7 +34,7 @@ namespace TodoServer
         public async Task<ActionResult<List<TodoItemDto>>> GetTodos()
         {
             var userId = int.Parse(User.FindFirst(x => x.Type == "id")?.Value);
-            var todos = await dbContext.Todos.Where(t => t.CreatedById == userId).ToListAsync();
+            var todos = await todoRepo.GetUserTodos(userId);
             var todoDtos = mapper.Map<List<TodoItemDto>>(todos);
             return Ok(todoDtos);
         }
@@ -40,7 +43,10 @@ namespace TodoServer
         public async Task<ActionResult<TodoItemDto>> GetTodo([Required]int? id)
         {
             var userId = int.Parse(User.FindFirst(x => x.Type == "id")?.Value);
-            var todo = await dbContext.Todos.FindAsync(id.Value);
+            var todo = await todoRepo.GetTodo(id.Value);
+            if (todo == null)
+                return NotFound();
+
             if (todo.CreatedById != userId)
                 return Forbid();
             
@@ -52,14 +58,14 @@ namespace TodoServer
         public async Task<ActionResult<TodoItemDto>> AddTodoItem([FromBody] AddTodoItemDto addTodoItem)
         {
             var userId = int.Parse(User.FindFirst(x => x.Type == "id")?.Value);
-            var user = await dbContext.Users.FindAsync(userId);
+            var user = await userRepo.GetUser(userId);
             var newTodoItem = new TodoItem
             {
                 CreatedBy = user,
                 Text = addTodoItem.Text
             };
-            dbContext.Todos.Add(newTodoItem);
-            await dbContext.SaveChangesAsync();
+
+            newTodoItem = await todoRepo.AddTodo(newTodoItem);
             var createdTodo = mapper.Map<TodoItemDto>(newTodoItem);
             return Created(string.Empty, createdTodo);
         }
