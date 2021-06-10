@@ -11,7 +11,11 @@ namespace TodoServer.Data.Impl.Configurations
             builder.ToTable("users")
                 .HasKey(x => x.Id);
 
+            builder.HasIndex(x => x.Username)
+                .IsUnique();
+
             builder.Property(x => x.Id)
+                .HasIdentityOptions(1, 1)
                 .IsRequired();
 
             builder.Property(x => x.Username)

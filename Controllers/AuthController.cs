@@ -30,28 +30,30 @@ namespace TodoServer.Controllers
             var user = await userRepo.GetUser(login.Username, login.Password);
             if (user == null)
                 return Unauthorized();
-            
+
             var key = new SymmetricSecurityKey(Encoding.UTF8.GetBytes("hello_world_hello_world"));
             var creds = new SigningCredentials(key, SecurityAlgorithms.HmacSha256);
-            var exp = DateTime.Now.AddSeconds(15);
+            var exp = DateTime.Now.AddMinutes(5);
             var token = new JwtSecurityToken(
                 issuer: "TodoServer",
                 audience: "TodoClient",
                 claims: new Claim[] {
-                    new Claim("username", login.Username),
-                    new Claim("password", login.Password)
+                    new Claim("id", user.Id.ToString()),
+                    new Claim("username", login.Username)
                 },
                 expires: exp,
                 signingCredentials: creds
             );
-            return Ok(new {
+            return Ok(new
+            {
                 token = new JwtSecurityTokenHandler().WriteToken(token)
             });
         }
 
         [Authorize]
         [HttpGet("test")]
-        public IActionResult Test() {
+        public IActionResult Test()
+        {
             return Ok("authorized");
         }
     }

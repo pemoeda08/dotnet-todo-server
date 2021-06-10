@@ -1,6 +1,7 @@
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Reflection;
 using System.Security.Cryptography.X509Certificates;
 using System.Text;
 using System.Threading.Tasks;
@@ -53,7 +54,7 @@ namespace TodoServer
                         ValidateLifetime = true
                     };
                 });
-
+            services.AddAutoMapper(Assembly.GetExecutingAssembly());
             services.AddSwaggerGen(c =>
             {
                 c.SwaggerDoc("v1", new OpenApiInfo { Title = "TodoServer", Version = "v1" });
