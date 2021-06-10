@@ -17,19 +17,19 @@ namespace TodoServer.Controllers
     [Route("auth")]
     public class AuthController : ControllerBase
     {
-        // private readonly IUserRepository userRepo;
+        private readonly IUserRepository userRepo;
 
-        public AuthController()
+        public AuthController(IUserRepository userRepo)
         {
-            // this.userRepo = userRepo;
+            this.userRepo = userRepo;
         }
 
         [HttpPost("login")]
         public async Task<IActionResult> Login([FromBody] AuthDto login)
         {
-            // var user = await userRepo.GetUser(login.Username, login.Password);
-            // if (user == null)
-            //     return Unauthorized();
+            var user = await userRepo.GetUser(login.Username, login.Password);
+            if (user == null)
+                return Unauthorized();
             
             var key = new SymmetricSecurityKey(Encoding.UTF8.GetBytes("hello_world_hello_world"));
             var creds = new SigningCredentials(key, SecurityAlgorithms.HmacSha256);
@@ -45,8 +45,7 @@ namespace TodoServer.Controllers
                 signingCredentials: creds
             );
             return Ok(new {
-                token = new JwtSecurityTokenHandler().WriteToken(token),
-                data = token
+                token = new JwtSecurityTokenHandler().WriteToken(token)
             });
         }
 

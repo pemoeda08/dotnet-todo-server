@@ -33,6 +33,7 @@ namespace TodoServer
         {
 
             services.AddControllers();
+            services.AddRepositories();
             services.AddDbContext<TodoDbContext>();
             services.AddAuthentication(JwtBearerDefaults.AuthenticationScheme)
                 .AddJwtBearer(opt =>
