@@ -9,9 +9,13 @@ namespace TodoServer.Data
     {
         Task<List<TodoItem>> GetUserTodos(int userId);
         Task<TodoItem> GetTodo(long id);
-
+        Task<List<TodoItem>> GetTodos(params long[] ids);
         Task<TodoItem> AddTodo(TodoItem newItem);
         Task RemoveTodo(long id);
+        Task RemoveTodo(TodoItem todo);
+        Task RemoveTodos(params long[] ids);
+        Task RemoveTodos(IEnumerable<TodoItem> todos);
+        Task ClearTodo(int userId);
 
     }
 }

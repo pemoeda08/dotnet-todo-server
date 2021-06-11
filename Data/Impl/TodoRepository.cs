@@ -26,14 +26,15 @@ namespace TodoServer.Data.Impl
         public Task<TodoItem> GetTodo(long id) =>
             dbContext.Todos
                 .Include(t => t.CreatedBy)
-                .AsNoTracking()
                 .FirstOrDefaultAsync(t => t.Id == id);
+
+        public Task<List<TodoItem>> GetTodos(params long[] ids) =>
+            dbContext.Todos.Where(t => ids.Contains(t.Id)).ToListAsync();
 
         public Task<List<TodoItem>> GetUserTodos(int userId) =>
             dbContext.Todos
                 .Where(t => t.CreatedById == userId)
                 .Include(t => t.CreatedBy)
-                .AsNoTracking()
                 .ToListAsync();
 
         public async Task RemoveTodo(long id)
@@ -44,5 +45,36 @@ namespace TodoServer.Data.Impl
             dbContext.Todos.Remove(todo);
             await dbContext.SaveChangesAsync();
         }
+
+        public async Task RemoveTodo(TodoItem todo)
+        {
+            dbContext.Todos.Remove(todo);
+            await dbContext.SaveChangesAsync();
+        }
+
+        public async Task RemoveTodos(IEnumerable<TodoItem> todos)
+        {
+            dbContext.Todos.RemoveRange(todos);
+            await dbContext.SaveChangesAsync();
+        }
+
+        public async Task RemoveTodos(params long[] ids)
+        {
+            var todos = await dbContext.Todos.Where(t => ids.Contains(t.Id)).ToListAsync();
+            dbContext.RemoveRange(todos);
+            await dbContext.SaveChangesAsync();
+        }
+
+        public async Task ClearTodo(int userId)
+        {
+            var todos = await dbContext.Todos
+               .Where(t => t.CreatedById == userId)
+               .ToListAsync();
+
+            dbContext.Todos.RemoveRange(todos);
+            await dbContext.SaveChangesAsync();
+        }
+
+
     }
 }

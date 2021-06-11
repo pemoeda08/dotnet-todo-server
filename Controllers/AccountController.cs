@@ -30,7 +30,7 @@ namespace TodoServer.Controllers
             bool alreadyExists = await userRepo.Exists(registerDto.Username);
             if (alreadyExists)
                 return Problem(
-                    detail: "username already exists.",
+                    title: $"username '{registerDto.Username}' already exists.",
                     statusCode: StatusCodes.Status409Conflict
                 );
 
