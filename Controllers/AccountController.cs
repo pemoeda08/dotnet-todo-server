@@ -13,6 +13,7 @@ using TodoServer.Dto.User;
 namespace TodoServer.Controllers
 {
     [Route("account")]
+    [ApiController]
     public class AccountController : ControllerBase
     {
         private readonly IUserRepository userRepo;
@@ -24,7 +25,7 @@ namespace TodoServer.Controllers
             this.mapper = mapper;
         }
 
-        [HttpPut]
+        [HttpPost]
         public async Task<IActionResult> CreateAccount([FromBody] CreateAccountDto registerDto)
         {
             bool alreadyExists = await userRepo.Exists(registerDto.Username);

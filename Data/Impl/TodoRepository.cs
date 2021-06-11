@@ -18,9 +18,16 @@ namespace TodoServer.Data.Impl
 
         public async Task<TodoItem> AddTodo(TodoItem newItem)
         {
-            dbContext.Add(newItem);
+            dbContext.Todos.Add(newItem);
             await dbContext.SaveChangesAsync();
             return newItem;
+        }
+
+        public async Task<List<TodoItem>> AddTodos(IEnumerable<TodoItem> newTodos)
+        {
+            dbContext.Todos.AddRange(newTodos);
+            await dbContext.SaveChangesAsync();
+            return newTodos.ToList();
         }
 
         public Task<TodoItem> GetTodo(long id) =>
@@ -74,7 +81,6 @@ namespace TodoServer.Data.Impl
             dbContext.Todos.RemoveRange(todos);
             await dbContext.SaveChangesAsync();
         }
-
 
     }
 }

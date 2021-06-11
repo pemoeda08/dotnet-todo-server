@@ -18,21 +18,20 @@ namespace TodoServer
 
     [Authorize]
     [Route("todo")]
+    [ApiController]
     public class TodoController : ControllerBase
     {
         private readonly ITodoRepository todoRepo;
-        private readonly IUserRepository userRepo;
         private readonly IMapper mapper;
 
-        public TodoController(ITodoRepository todoRepo, IUserRepository userRepo, IMapper mapper)
+        public TodoController(ITodoRepository todoRepo, IMapper mapper)
         {
             this.todoRepo = todoRepo;
-            this.userRepo = userRepo;
             this.mapper = mapper;
         }
 
         [HttpGet]
-        public async Task<ActionResult<List<TodoItemDto>>> GetTodos()
+        public async Task<ActionResult<List<TodoItemDto>>> GetOwnedTodos()
         {
             var userId = int.Parse(User.FindFirst(x => x.Type == "id")?.Value);
             var todos = await todoRepo.GetUserTodos(userId);
@@ -56,24 +55,29 @@ namespace TodoServer
         }
 
         [HttpPost]
-        public async Task<ActionResult<TodoItemDto>> AddTodoItem([FromBody] AddTodoItemDto addTodoItem)
+        public async Task<ActionResult<List<TodoItemDto>>> AddTodos([FromBody] IEnumerable<AddTodoItemDto> addTodoItems)
         {
             var userId = int.Parse(User.FindFirst(x => x.Type == "id")?.Value);
-            var user = await userRepo.GetUser(userId);
-            var newTodoItem = new TodoItem
-            {
-                CreatedBy = user,
-                Text = addTodoItem.Text
-            };
 
-            newTodoItem = await todoRepo.AddTodo(newTodoItem);
-            var createdTodo = mapper.Map<TodoItemDto>(newTodoItem);
-            return Created(string.Empty, createdTodo);
+            var newTodos = addTodoItems.Select(nt => new TodoItem
+            {
+                CreatedById = userId,
+                Text = nt.Text
+            });
+            
+            newTodos  = await todoRepo.AddTodos(newTodos);
+            var createdTodos = mapper.Map<List<TodoItemDto>>(newTodos);
+            return Created(string.Empty, createdTodos);
         }
 
         [HttpDelete]
-        public async Task<IActionResult> RemoveTodos([FromQuery] long[] ids)
+        public async Task<IActionResult> RemoveTodos([FromQuery, Required] long[] ids)
         {
+            if (ids.Length == 0)
+                return BadRequest(new {
+                    title = "must specify at least one id."
+                });
+                
             var todos = await todoRepo.GetTodos(ids);
             var idsNotFound = ids.Except(todos.Select(t => t.Id));
             if (idsNotFound.Any())

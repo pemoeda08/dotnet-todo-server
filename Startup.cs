@@ -51,7 +51,7 @@ namespace TodoServer
                         ValidateIssuer = false,
                         // ValidateActor = true,
                         ClockSkew = TimeSpan.Zero,
-                        ValidateLifetime = true
+                        ValidateLifetime = false
                     };
                 });
             services.AddAutoMapper(Assembly.GetExecutingAssembly());

@@ -10,7 +10,6 @@ namespace TodoServer.Data.Impl.Configurations {
         {
             builder.ToTable("todos")
                 .HasKey(x => x.Id);
-            
 
             builder.Property(x => x.Id)
                 .HasIdentityOptions(1, 1);
@@ -20,6 +19,7 @@ namespace TodoServer.Data.Impl.Configurations {
                 .HasColumnType("text");
             
             builder.Property(x => x.CreatedAt)
+                .ValueGeneratedOnAdd()
                 .HasDefaultValueSql("now()")
                 .IsRequired();
             

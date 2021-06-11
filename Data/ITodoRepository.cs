@@ -11,6 +11,7 @@ namespace TodoServer.Data
         Task<TodoItem> GetTodo(long id);
         Task<List<TodoItem>> GetTodos(params long[] ids);
         Task<TodoItem> AddTodo(TodoItem newItem);
+        Task<List<TodoItem>> AddTodos(IEnumerable<TodoItem> newTodos);
         Task RemoveTodo(long id);
         Task RemoveTodo(TodoItem todo);
         Task RemoveTodos(params long[] ids);
