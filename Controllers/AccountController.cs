@@ -4,6 +4,7 @@ using AutoMapper;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
+using Swashbuckle.AspNetCore.Annotations;
 using TodoServer.Data;
 using TodoServer.Data.Entities;
 using TodoServer.Data.Impl;
@@ -12,8 +13,10 @@ using TodoServer.Dto.User;
 
 namespace TodoServer.Controllers
 {
+    
     [Route("account")]
     [ApiController]
+    [SwaggerTag("Manage account")]
     public class AccountController : ControllerBase
     {
         private readonly IUserRepository userRepo;
@@ -25,8 +28,13 @@ namespace TodoServer.Controllers
             this.mapper = mapper;
         }
 
+        [SwaggerOperation(
+            Summary = "Create new user/account"
+        )]
+        [SwaggerResponse(200, "Returns newly created user", typeof(UserDto))]
+        [SwaggerResponse(409, "Username is already used")]
         [HttpPost]
-        public async Task<IActionResult> CreateAccount([FromBody] CreateAccountDto registerDto)
+        public async Task<ActionResult<UserDto>> CreateAccount([FromBody] CreateAccountDto registerDto)
         {
             bool alreadyExists = await userRepo.Exists(registerDto.Username);
             if (alreadyExists)

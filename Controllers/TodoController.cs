@@ -12,13 +12,14 @@ using TodoServer.Data.Impl;
 using TodoServer.Dto.Todo;
 using TodoServer.Data;
 using Microsoft.AspNetCore.Http;
+using Swashbuckle.AspNetCore.Annotations;
 
 namespace TodoServer
 {
 
-    [Authorize]
     [Route("todo")]
     [ApiController]
+    [SwaggerTag("Manage todo(s)")]
     public class TodoController : ControllerBase
     {
         private readonly ITodoRepository todoRepo;
@@ -31,6 +32,9 @@ namespace TodoServer
         }
 
         [HttpGet]
+        [Authorize]
+        [SwaggerOperation( Summary = "Get logged user's owned todos")]
+        [SwaggerResponse(200, "Returns list of todos owned by current user", typeof(List<TodoItemDto>))]
         public async Task<ActionResult<List<TodoItemDto>>> GetOwnedTodos()
         {
             var userId = int.Parse(User.FindFirst(x => x.Type == "id")?.Value);
@@ -40,6 +44,11 @@ namespace TodoServer
         }
 
         [HttpGet("{id}")]
+        [Authorize]
+        [SwaggerOperation( Summary = "Get specified todo information")]
+        [SwaggerResponse(200, "Returns todo information", typeof(TodoItemDto))]
+        [SwaggerResponse(404, "If specified todo is not found")]
+        [SwaggerResponse(403, "If the specified todo is not owned by current user")]
         public async Task<ActionResult<TodoItemDto>> GetTodo([Required] int? id)
         {
             var userId = int.Parse(User.FindFirst(x => x.Type == "id")?.Value);
@@ -55,6 +64,9 @@ namespace TodoServer
         }
 
         [HttpPost]
+        [Authorize]
+        [SwaggerOperation( Summary = "Add new todo(s)")]
+        [SwaggerResponse(201, "Todo is created", typeof(List<TodoItemDto>))]
         public async Task<ActionResult<List<TodoItemDto>>> AddTodos([FromBody] IEnumerable<AddTodoItemDto> addTodoItems)
         {
             var userId = int.Parse(User.FindFirst(x => x.Type == "id")?.Value);
@@ -71,6 +83,12 @@ namespace TodoServer
         }
 
         [HttpDelete]
+        [Authorize]
+        [SwaggerOperation( Summary = "Remove todo(s)")]
+        [SwaggerResponse(204, "Specified todo(s) successfully removed" )]
+        [SwaggerResponse(400, "If there is not at least one id specified")]
+        [SwaggerResponse(403, "If the user doesn't have access to the specified id(s)", typeof(int[]))]
+        [SwaggerResponse(404, "If one or more of specified id is not found", typeof(int[]))]
         public async Task<IActionResult> RemoveTodos([FromQuery, Required] long[] ids)
         {
             if (ids.Length == 0)
@@ -103,6 +121,11 @@ namespace TodoServer
         }
 
         [HttpDelete("{id}")]
+        [Authorize]
+        [SwaggerOperation( Summary = "Remove specified todo")]
+        [SwaggerResponse(404, "If specified todo doesn't exist")]
+        [SwaggerResponse(403, "If current user doesn't have access to the specified todo")]
+        [SwaggerResponse(204, "Specified todo successfully removed")]
         public async Task<IActionResult> RemoveTodo(long id)
         {
             var userId = int.Parse(User.FindFirst(x => x.Type == "id")?.Value);
