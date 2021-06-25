@@ -1,6 +1,7 @@
 using System;
 using System.Reflection;
 using Microsoft.EntityFrameworkCore;
+using Microsoft.Extensions.Logging;
 using TodoServer.Data.Entities;
 
 namespace TodoServer.Data.Impl
@@ -15,7 +16,7 @@ namespace TodoServer.Data.Impl
                 })
                 .EnableDetailedErrors()
                 .EnableSensitiveDataLogging()
-                .LogTo(Console.WriteLine);
+                .LogTo(Console.WriteLine, LogLevel.Error);
         }
 
         public DbSet<User> Users { get; set; }

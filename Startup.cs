@@ -46,7 +46,7 @@ namespace TodoServer
                     {
                         ValidateIssuerSigningKey = true,
                         IssuerSigningKey = new SymmetricSecurityKey(pkBytes),
-                        // ClockSkew = TimeSpan.Zero,
+
                         ValidateAudience = false,
                         // LifetimeValidator = null,
                         ValidateIssuer = false,
@@ -99,8 +99,6 @@ namespace TodoServer
                 app.UseSwagger();
                 app.UseSwaggerUI(c => c.SwaggerEndpoint("/swagger/v1/swagger.json", "TodoServer v1"));
             }
-
-            app.UseHttpsRedirection();
 
             app.UseRouting();
 
